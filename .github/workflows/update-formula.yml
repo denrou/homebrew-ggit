@@ -1,0 +1,49 @@
+name: Update Formula
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install ggit homebrew-pypi-poet
+
+      - name: Generate formula
+        run: |
+          poet -f ggit > Formula/ggit.rb
+
+          # Patch desc, homepage, license, and test block
+          sed -i 's|desc ".*"|desc "TUI to scan directories for git repositories and show their status"|' Formula/ggit.rb
+          sed -i 's|homepage ".*"|homepage "https://github.com/denrou/ggit"|' Formula/ggit.rb
+          sed -i '/^  sha256/a\  license "MIT"' Formula/ggit.rb
+          sed -i 's|.*false.*|    assert_predicate bin/"ggit", :exist?|' Formula/ggit.rb
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet Formula/ggit.rb; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          VERSION=$(grep -oP 'ggit-\K[0-9]+\.[0-9]+\.[0-9]+' Formula/ggit.rb | head -1)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/ggit.rb
+          git commit -m "Update ggit to ${VERSION}"
+          git push
