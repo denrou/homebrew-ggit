@@ -17,7 +17,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install ggit homebrew-pypi-poet
+        run: pip install setuptools ggit homebrew-pypi-poet
 
       - name: Generate formula
         run: |
