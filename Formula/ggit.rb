@@ -3,8 +3,8 @@ class Ggit < Formula
 
   desc "TUI to scan directories for git repositories and show their status"
   homepage "https://github.com/denrou/ggit"
-  url "https://files.pythonhosted.org/packages/27/46/e2507a9a357f2e6779b864eff0eaf7e64f5a9df5b057f4bcd57f47e1402f/ggit-0.3.0.tar.gz"
-  sha256 "ac1d94e6c948a9f777c7be2af3a71fe01118ad474d7992e674d4556e0ed6c1f5"
+  url "https://files.pythonhosted.org/packages/2c/b7/c574f99b108c5be8a2e86d13f8be7009236b3b1a98316c43f62236067962/ggit-0.4.0.tar.gz"
+  sha256 "6fd66dc9b10f34d463c42f5a6a25c62768a1789be0f516fb922dd0add36bd3d2"
   license "MIT"
 
   depends_on "python3"
