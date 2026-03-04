@@ -3,8 +3,8 @@ class Ggit < Formula
 
   desc "TUI to scan directories for git repositories and show their status"
   homepage "https://github.com/denrou/ggit"
-  url "https://files.pythonhosted.org/packages/2c/b7/c574f99b108c5be8a2e86d13f8be7009236b3b1a98316c43f62236067962/ggit-0.4.0.tar.gz"
-  sha256 "6fd66dc9b10f34d463c42f5a6a25c62768a1789be0f516fb922dd0add36bd3d2"
+  url "https://files.pythonhosted.org/packages/51/b2/33859b5e543615a190fcd8d6f14de8f192e0b32005489a248059c83aaf5d/ggit-0.5.1.tar.gz"
+  sha256 "adae0d9ebb9332e95f5651c94ec843dd1560c1d7b024f84b2830df0c840de041"
   license "MIT"
 
   depends_on "python3"
@@ -60,8 +60,8 @@ class Ggit < Formula
   end
 
   resource "textual" do
-    url "https://files.pythonhosted.org/packages/fb/e4/0f6b6c22a30d2dc2850b4d09c8684742cc4ab79501d4588ea05269c1de3f/textual-8.0.1.tar.gz"
-    sha256 "fe6544e57651a7c2a8249b90ec542b45fa945ce4560e69b0d563fb440e7c4db3"
+    url "https://files.pythonhosted.org/packages/be/08/c6bcb1e3c4c9528ec9049f4ac685afdafc72866664270f0deb416ccbba2a/textual-8.0.2.tar.gz"
+    sha256 "7b342f3ee9a5f2f1bd42d7b598cae00ff1275da68536769510db4b7fe8cabf5d"
   end
 
   resource "typing-extensions" do
