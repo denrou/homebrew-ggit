@@ -15,8 +15,8 @@ class Ggit < Formula
   end
 
   resource "GitPython" do
-    url "https://files.pythonhosted.org/packages/5e/d5/3da0b92033887033f4c27f2dd109a303c4ca62813c7b3bb2511edb4777de/gitpython-3.1.54.tar.gz"
-    sha256 "53f2085e24a2cda300eed7c3fc5f1559ae289634b725e98acaf4791940247aa0"
+    url "https://files.pythonhosted.org/packages/ba/0d/132ed135c871b6bf91adf16a0e43797cd535b81d4973b5d09291c54fc5ee/gitpython-3.1.57.tar.gz"
+    sha256 "c493ec57c0ef6b19743798b6a5af859c71814b524e7e6f97baa2f8e658961488"
   end
 
   resource "linkify-it-py" do
