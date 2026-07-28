@@ -14,7 +14,7 @@ class Ggit < Formula
     sha256 "5ef71f855d191a3326fcfbc0d5da835f26b13fbcba60c32c21091c349ffdb571"
   end
 
-  resource "GitPython" do
+  resource "gitpython" do
     url "https://files.pythonhosted.org/packages/ba/0d/132ed135c871b6bf91adf16a0e43797cd535b81d4973b5d09291c54fc5ee/gitpython-3.1.57.tar.gz"
     sha256 "c493ec57c0ef6b19743798b6a5af859c71814b524e7e6f97baa2f8e658961488"
   end
@@ -44,7 +44,7 @@ class Ggit < Formula
     sha256 "0555d18370482847566ffabcaa53ad7c6c1c29f195989ae1ed634a05f76ea1e0"
   end
 
-  resource "Pygments" do
+  resource "pygments" do
     url "https://files.pythonhosted.org/packages/c3/b2/bc9c9196916376152d655522fdcebac55e66de6603a76a02bca1b6414f6c/pygments-2.20.0.tar.gz"
     sha256 "6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f"
   end
@@ -80,6 +80,6 @@ class Ggit < Formula
   end
 
   test do
-    assert_predicate bin/"ggit", :exist?
+    assert_path_exists bin/"ggit"
   end
 end

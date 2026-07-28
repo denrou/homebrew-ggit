@@ -12,47 +12,63 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      # Pinned: the master ref is deprecated and will hard-error at Homebrew 5.2.0.
+      - uses: Homebrew/actions/setup-homebrew@1f8e202ffddf94def7f42f6fa3a482e821489f9c # 2026.07.10.1
 
-      - name: Install dependencies
+      # Let brew resolve this checkout as the denrou/ggit tap so
+      # `update-python-resources` can operate on it (and edit it in place).
+      - name: Register checkout as a tap
         run: |
-          pip install setuptools
-          pip install ggit homebrew-pypi-poet
+          taps="$(brew --repository)/Library/Taps/denrou"
+          mkdir -p "$taps"
+          ln -s "$GITHUB_WORKSPACE" "$taps/homebrew-ggit"
 
-      - name: Generate formula
+      # Point the formula's own url/sha256 at the latest PyPI sdist. The
+      # version is carried in the url, so there is no separate version line
+      # to bump; update-python-resources infers it from the url below.
+      - name: Bump to the latest release
         run: |
-          poet -f ggit > Formula/ggit.rb
+          read -r url sha256 <<EOF
+          $(python3 - <<'PY'
+          import json, urllib.request
+          d = json.load(urllib.request.urlopen("https://pypi.org/pypi/ggit/json"))
+          v = d["info"]["version"]
+          sdist = next(u for u in d["releases"][v] if u["packagetype"] == "sdist")
+          print(sdist["url"], sdist["digests"]["sha256"])
+          PY
+          )
+          EOF
+          sed -i -E "s#^  url \".*\"#  url \"${url}\"#" Formula/ggit.rb
+          sed -i -E "s#^  sha256 \".*\"#  sha256 \"${sha256}\"#" Formula/ggit.rb
 
-          # Patch desc, homepage, license, and test block
-          sed -i 's|desc ".*"|desc "TUI to scan directories for git repositories and show their status"|' Formula/ggit.rb
-          sed -i 's|homepage ".*"|homepage "https://github.com/denrou/ggit"|' Formula/ggit.rb
-          sed -i '/^  sha256/a\  license "MIT"' Formula/ggit.rb
-          sed -i 's|.*false.*|    assert_predicate bin/"ggit", :exist?|' Formula/ggit.rb
-
-      - name: Check for changes
-        id: diff
+      # Regenerate the dependency resource blocks with Homebrew's own tooling
+      # (the maintained replacement for homebrew-pypi-poet).
+      # --ignore-main-package-cooldown lets this run the same day as a release:
+      # PyPI's fresh-upload guard would otherwise hide the just-published
+      # version. Dependencies are long-published, so they still respect it.
+      - name: Regenerate resources
         run: |
-          if git diff --quiet Formula/ggit.rb; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+          brew update-python-resources --ignore-main-package-cooldown \
+            denrou/ggit/ggit
 
-      - name: Commit and push
-        if: steps.diff.outputs.changed == 'true'
+      - name: Sanity-check the formula
+        run: brew style denrou/ggit/ggit
+
+      - name: Commit and push if changed
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          VERSION=$(grep -oP 'ggit-\K[0-9]+\.[0-9]+\.[0-9]+' Formula/ggit.rb | head -1)
+          if git diff --quiet -- Formula/ggit.rb; then
+            echo "Formula already up to date; nothing to commit."
+            exit 0
+          fi
+          version="$(python3 -c 'import json,urllib.request;print(json.load(urllib.request.urlopen("https://pypi.org/pypi/ggit/json"))["info"]["version"])')"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Formula/ggit.rb
-          git commit -m "Update ggit to ${VERSION}"
-          # Hardened push (same as denrou/homebrew-gh-prs #2/#3): an explicit
-          # refspec and token-authenticated URL, so the push keeps working even
-          # if later steps stop preserving checkout's branch tracking or auth
-          # header (that's what silently broke the gh-prs tap's brew-based flow).
+          git commit -am "Update ggit to ${version}"
+          # Authenticate the push explicitly: checkout's persisted auth header
+          # doesn't survive the Homebrew tap-symlink environment, so a plain
+          # `git push origin` has no credentials here. The refspec is needed
+          # too — the checkout has no upstream branch.
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push origin HEAD:main
