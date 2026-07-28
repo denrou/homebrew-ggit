@@ -42,10 +42,17 @@ jobs:
 
       - name: Commit and push
         if: steps.diff.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(grep -oP 'ggit-\K[0-9]+\.[0-9]+\.[0-9]+' Formula/ggit.rb | head -1)
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/ggit.rb
           git commit -m "Update ggit to ${VERSION}"
-          git push
+          # Hardened push (same as denrou/homebrew-gh-prs #2/#3): an explicit
+          # refspec and token-authenticated URL, so the push keeps working even
+          # if later steps stop preserving checkout's branch tracking or auth
+          # header (that's what silently broke the gh-prs tap's brew-based flow).
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin HEAD:main
