@@ -1,22 +1,7 @@
 # homebrew-ggit
 
-Homebrew tap for [ggit](https://github.com/denrou/ggit) — an interactive TUI to scan directories for git repositories and show their status.
-
-## Install
+This tap moved to [denrou/homebrew-tap](https://github.com/denrou/homebrew-tap), which gathers the Homebrew formulas of every denrou tool. `brew update` moves an installed `ggit` there by itself; a new install is:
 
 ```bash
-brew install denrou/ggit/ggit
-```
-
-Or tap first:
-
-```bash
-brew tap denrou/ggit
-brew install ggit
-```
-
-## Update
-
-```bash
-brew upgrade ggit
+brew install denrou/tap/ggit
 ```
